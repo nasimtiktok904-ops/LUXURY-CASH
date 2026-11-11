@@ -38,8 +38,7 @@
     .user-info h4 { font-size: 15px; font-weight: 700; color: var(--text-main); }
     .user-info p { font-size: 12px; color: var(--accent-gold); }
 
-    /* এডমিন বাটন শুধু আপনার জন্য দেখাবে */
-    .admin-btn-trigger { background: rgba(255, 215, 0, 0.1); border: 1px solid var(--accent-gold); color: var(--accent-gold); padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; cursor: pointer; display: none; }
+    .admin-btn-trigger { background: rgba(255, 215, 0, 0.1); border: 1px solid var(--accent-gold); color: var(--accent-gold); padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 5px; }
 
     /* Tab Contents */
     .tab-content { display: none; padding: 20px; animation: fadeIn 0.3s ease-in-out; }
@@ -71,11 +70,6 @@
     .form-group label { display: block; font-size: 13px; color: var(--text-muted); margin-bottom: 6px; }
     .form-control { width: 100%; padding: 12px 16px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: #fff; font-size: 14px; outline: none; }
 
-    .history-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 13px; }
-    .badge { padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 700; text-transform: uppercase; }
-    .badge-pending { background: rgba(245, 158, 11, 0.2); color: #F59E0B; }
-    .badge-approved { background: rgba(16, 185, 129, 0.2); color: #10B981; }
-
     /* Bottom Navigation Menu */
     .bottom-nav { position: fixed; bottom: 0; width: 100%; max-width: 480px; background: rgba(11, 14, 20, 0.95); backdrop-filter: blur(15px); display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid rgba(255,255,255,0.08); z-index: 100; }
     .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--text-muted); text-decoration: none; font-size: 11px; gap: 4px; cursor: pointer; }
@@ -98,7 +92,8 @@
         <p id="userRole">💎 VIP Member</p>
       </div>
     </div>
-    <button id="adminTriggerBtn" class="admin-btn-trigger" onclick="openAdminPanel()">
+    <!-- পাসওয়ার্ড প্রটেক্টেড এডমিন বাটন -->
+    <button class="admin-btn-trigger" onclick="checkAdminPassword()">
       <i class="fa-solid fa-user-shield"></i> Admin Panel
     </button>
   </div>
@@ -126,17 +121,6 @@
       </div>
       <button class="btn-gold" onclick="watchMonetagAd()">Watch Ad</button>
     </div>
-
-    <div class="luxury-card">
-      <div class="card-left">
-        <div class="card-icon"><i class="fa-solid fa-headset"></i></div>
-        <div class="card-info">
-          <h4>Need Help?</h4>
-          <p>24/7 VIP Support</p>
-        </div>
-      </div>
-      <button class="btn-gold" onclick="openSupport()">Support</button>
-    </div>
   </div>
 
   <!-- 2. REFER TAB -->
@@ -151,9 +135,6 @@
         <button class="btn-gold" onclick="copyRefLink()">Copy</button>
       </div>
     </div>
-
-    <div class="section-title" style="margin-top: 20px;"><i class="fa-solid fa-user-group"></i> My Joined Referred Users</div>
-    <div id="referredUsersList" class="luxury-card" style="flex-direction: column; align-items: stretch;"></div>
   </div>
 
   <!-- 3. WITHDRAW TAB -->
@@ -178,9 +159,6 @@
       </div>
       <button class="btn-gold" style="width: 100%; padding: 12px;" onclick="submitWithdrawal()">Submit Request</button>
     </div>
-
-    <div class="section-title" style="margin-top: 20px;"><i class="fa-solid fa-clock-rotate-left"></i> Withdrawal History</div>
-    <div id="withdrawHistory"></div>
   </div>
 
   <!-- Bottom Navigation -->
@@ -191,7 +169,7 @@
   </div>
 </div>
 
-<!-- Secured Admin Control Panel -->
+<!-- Password Protected Admin Panel -->
 <div id="adminModal" class="admin-modal">
   <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
     <h3 style="color:var(--accent-gold);"><i class="fa-solid fa-user-gear"></i> Admin Panel</h3>
@@ -206,12 +184,12 @@
 </div>
 
 <script>
-  // ⚙️ আপনার টেলিগ্রাম এবং Supabase সেটিংস লিংক
-  const ADMIN_TELEGRAM_ID = 123456789; // এখানে আপনার আসল টেলিগ্রাম Numeric ID দিন
-  const BOT_USERNAME = "FAST_ASH77_BOT"; // আপনার বটের ইউজারনেম
+  // নতুন পাসওয়ার্ড সেটআপ (131272)
+  const ADMIN_PASSWORD = "131272"; 
+  const BOT_USERNAME = "FAST_ASH77_BOT"; 
 
-  const SUPABASE_URL = "https://your-project.supabase.co"; // আপনার Supabase URL
-  const SUPABASE_ANON_KEY = "your-supabase-anon-key"; // আপনার Supabase Anon Key
+  const SUPABASE_URL = "https://your-project.supabase.co"; 
+  const SUPABASE_ANON_KEY = "your-supabase-anon-key"; 
 
   const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   let currentUser = null;
@@ -222,21 +200,13 @@
     const tg = window.Telegram.WebApp;
     tg.ready();
 
-    // টেলিগ্রাম থেকে ইউজারের প্রোফাইল ডাটা রিড করা
-    const tgUser = tg.initDataUnsafe?.user || { id: 999999, first_name: "User" };
+    const tgUser = tg.initDataUnsafe?.user || { id: Math.floor(Math.random()*100000), first_name: "User_" + Math.floor(Math.random()*900) };
     const startParam = tg.initDataUnsafe?.start_param; 
     const referrerId = startParam ? parseInt(startParam) : null;
 
-    // এডমিন বাটন শুধু আপনার টেলিগ্রাম আইডির জন্য দৃশ্যমান হবে
-    if (tgUser.id === ADMIN_TELEGRAM_ID) {
-      document.getElementById('adminTriggerBtn').style.display = 'block';
-    }
-
-    // Supabase ডাটাবেস চেক করা
     let { data: user } = await db.from('users').select('*').eq('telegram_id', tgUser.id).single();
 
     if (!user) {
-      // নতুন ইউজার ডাটাবেসে সেভ করা
       const { data: newUser } = await db.from('users').insert([{
         telegram_id: tgUser.id,
         first_name: tgUser.first_name,
@@ -245,7 +215,6 @@
 
       user = newUser;
 
-      // রেফারাল বোনাস দেওয়া
       if (referrerId && referrerId !== tgUser.id) {
         let { data: refUser } = await db.from('users').select('balance').eq('telegram_id', referrerId).single();
         if (refUser) {
@@ -262,8 +231,6 @@
     document.getElementById('userName').innerText = tgUser.first_name;
     document.getElementById('userAvatar').innerText = tgUser.first_name.charAt(0).toUpperCase();
     document.getElementById('userBalance').innerText = currentUser.balance.toFixed(2);
-    
-    // ইউনিক রেফারাল লিংক
     document.getElementById('refLinkInput').value = `https://t.me/${BOT_USERNAME}?start=${currentUser.telegram_id}`;
   }
 
@@ -281,12 +248,38 @@
     alert("আপনার রেফারাল লিংক কপি করা হয়েছে!");
   }
 
-  function openAdminPanel() {
-    document.getElementById('adminModal').classList.add('active');
+  // আপডেট করা পাসওয়ার্ড চেক ফাংশন
+  function checkAdminPassword() {
+    const pass = prompt("এডমিন প্যানেলে প্রবেশ করতে পাসওয়ার্ড দিন:");
+    if (pass === ADMIN_PASSWORD) {
+      document.getElementById('adminModal').classList.add('active');
+    } else if (pass !== null) {
+      alert("ভুল পাসওয়ার্ড! প্রবেশাধিকার সংরক্ষিত।");
+    }
   }
 
   function closeAdminPanel() {
     document.getElementById('adminModal').classList.remove('active');
+  }
+
+  function saveAdminSettings() {
+    const url = document.getElementById('adminMonetagUrl').value;
+    localStorage.setItem('monetag_url', url);
+    alert("সেটিংস সফলভাবে সংরক্ষিত হয়েছে!");
+    closeAdminPanel();
+  }
+
+  function watchMonetagAd() {
+    const adUrl = localStorage.getItem('monetag_url') || "https://example.com";
+    window.open(adUrl, '_blank');
+    
+    setTimeout(async () => {
+      const newBal = currentUser.balance + 5.00;
+      await db.from('users').update({ balance: newBal }).eq('telegram_id', currentUser.telegram_id);
+      currentUser.balance = newBal;
+      document.getElementById('userBalance').innerText = newBal.toFixed(2);
+      alert("অভিনন্দন! আপনি ৫.০০ BDT রিওয়ার্ড পেয়েছেন।");
+    }, 1500);
   }
 
   async function submitWithdrawal() {
@@ -303,7 +296,6 @@
       return;
     }
 
-    // Supabase উইথড্রল রিকোয়েস্ট
     const { error } = await db.from('withdraw_requests').insert([{
       telegram_id: currentUser.telegram_id,
       method: method,
@@ -321,4 +313,4 @@
   }
 </script>
 </body>
-        </html>
+      </html>
