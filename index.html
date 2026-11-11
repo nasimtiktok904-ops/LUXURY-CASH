@@ -5,11 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>FAST CASH - Telegram Mini App</title>
   
-  <!-- Telegram WebApp SDK & Supabase JS SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   
-  <!-- Google Fonts & Font Awesome Icons -->
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
@@ -31,7 +29,6 @@
 
     .app-container { width: 100%; max-width: 480px; background: #0B0E14; position: relative; padding-bottom: 90px; box-shadow: 0 0 50px rgba(0,0,0,0.8); min-height: 100vh; }
 
-    /* Top Navigation */
     .top-bar { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; background: rgba(11, 14, 20, 0.8); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
     .user-profile { display: flex; align-items: center; gap: 12px; }
     .avatar { width: 42px; height: 42px; border-radius: 50%; background: var(--accent-gold-gradient); display: flex; align-items: center; justify-content: center; color: #000; font-weight: 800; font-size: 18px; box-shadow: 0 0 10px rgba(255, 215, 0, 0.3); }
@@ -40,12 +37,10 @@
 
     .admin-btn-trigger { background: rgba(255, 215, 0, 0.1); border: 1px solid var(--accent-gold); color: var(--accent-gold); padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 5px; }
 
-    /* Tab Contents */
     .tab-content { display: none; padding: 20px; animation: fadeIn 0.3s ease-in-out; }
     .tab-content.active { display: block; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* Balance Luxury Card */
     .balance-card { background: linear-gradient(135deg, rgba(30,35,45,0.9) 0%, rgba(15,18,25,0.9) 100%); border: 1px solid var(--bg-card-border); border-radius: 24px; padding: 24px; text-align: center; position: relative; overflow: hidden; margin-bottom: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
     .balance-title { font-size: 13px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); margin-bottom: 8px; }
     .balance-amount { font-size: 38px; font-weight: 800; background: var(--accent-gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 16px; }
@@ -70,12 +65,15 @@
     .form-group label { display: block; font-size: 13px; color: var(--text-muted); margin-bottom: 6px; }
     .form-control { width: 100%; padding: 12px 16px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: #fff; font-size: 14px; outline: none; }
 
-    /* Bottom Navigation Menu */
+    .history-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 13px; }
+    .badge { padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 700; text-transform: uppercase; }
+    .badge-pending { background: rgba(245, 158, 11, 0.2); color: #F59E0B; }
+    .badge-approved { background: rgba(16, 185, 129, 0.2); color: #10B981; }
+
     .bottom-nav { position: fixed; bottom: 0; width: 100%; max-width: 480px; background: rgba(11, 14, 20, 0.95); backdrop-filter: blur(15px); display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid rgba(255,255,255,0.08); z-index: 100; }
     .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--text-muted); text-decoration: none; font-size: 11px; gap: 4px; cursor: pointer; }
     .nav-item.active { color: var(--accent-gold); }
 
-    /* Admin Modal Overlay */
     .admin-modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 1000; padding: 20px; overflow-y: auto; }
     .admin-modal.active { display: block; }
   </style>
@@ -83,7 +81,6 @@
 <body>
 
 <div class="app-container">
-  <!-- Top Bar -->
   <div class="top-bar">
     <div class="user-profile">
       <div class="avatar" id="userAvatar">U</div>
@@ -92,13 +89,12 @@
         <p id="userRole">💎 VIP Member</p>
       </div>
     </div>
-    <!-- পাসওয়ার্ড প্রটেক্টেড এডমিন বাটন -->
     <button class="admin-btn-trigger" onclick="checkAdminPassword()">
-      <i class="fa-solid fa-user-shield"></i> Admin Panel
+      <i class="fa-solid fa-user-shield"></i> Admin
     </button>
   </div>
 
-  <!-- 1. DASHBOARD TAB -->
+  <!-- DASHBOARD -->
   <div id="tab-dashboard" class="tab-content active">
     <div class="balance-card">
       <div class="balance-title">Current Balance</div>
@@ -123,21 +119,26 @@
     </div>
   </div>
 
-  <!-- 2. REFER TAB -->
+  <!-- REFER TAB -->
   <div id="tab-refer" class="tab-content">
     <div class="section-title"><i class="fa-solid fa-users"></i> Refer & Earn</div>
     <div class="luxury-card" style="flex-direction: column; align-items: flex-start; gap: 12px;">
       <p style="font-size: 13px; color: var(--text-muted);">
-        Invite friends using your link and earn <b style="color: var(--accent-gold);"><span id="refRewardText">10.00</span> ৳</b>!
+        Invite friends using your link and earn <b style="color: var(--accent-gold);">10.00 ৳</b>!
       </p>
       <div style="display: flex; gap: 8px; width: 100%;">
         <input type="text" id="refLinkInput" class="form-control" readonly value="">
         <button class="btn-gold" onclick="copyRefLink()">Copy</button>
       </div>
     </div>
+
+    <div class="section-title" style="margin-top: 20px;"><i class="fa-solid fa-user-group"></i> My Referred Users</div>
+    <div id="referredUsersList" class="luxury-card" style="flex-direction: column; align-items: stretch;">
+      <p style="font-size: 12px; color: var(--text-muted);">কেউ এখনো জয়েন করেনি।</p>
+    </div>
   </div>
 
-  <!-- 3. WITHDRAW TAB -->
+  <!-- WITHDRAW TAB -->
   <div id="tab-withdraw" class="tab-content">
     <div class="section-title"><i class="fa-solid fa-wallet"></i> Request Payout</div>
     <div class="luxury-card" style="flex-direction: column; align-items: stretch; gap: 12px;">
@@ -154,14 +155,17 @@
         <input type="number" id="withdrawPhone" class="form-control" placeholder="017xxxxxxxx">
       </div>
       <div class="form-group">
-        <label>Amount (Min Payout: <span id="minWithdrawText">100</span> BDT)</label>
+        <label>Amount (Min Payout: 100 BDT)</label>
         <input type="number" id="withdrawAmount" class="form-control" placeholder="100">
       </div>
       <button class="btn-gold" style="width: 100%; padding: 12px;" onclick="submitWithdrawal()">Submit Request</button>
     </div>
+
+    <div class="section-title" style="margin-top: 20px;"><i class="fa-solid fa-clock-rotate-left"></i> My History</div>
+    <div id="withdrawHistory"></div>
   </div>
 
-  <!-- Bottom Navigation -->
+  <!-- BOTTOM NAV -->
   <div class="bottom-nav">
     <div class="nav-item active" onclick="switchTab('dashboard', this)"><i class="fa-solid fa-house"></i><span>Home</span></div>
     <div class="nav-item" onclick="switchTab('refer', this)"><i class="fa-solid fa-users"></i><span>Refer</span></div>
@@ -169,10 +173,10 @@
   </div>
 </div>
 
-<!-- Password Protected Admin Panel -->
+<!-- ADMIN PANEL MODAL -->
 <div id="adminModal" class="admin-modal">
   <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-    <h3 style="color:var(--accent-gold);"><i class="fa-solid fa-user-gear"></i> Admin Panel</h3>
+    <h3 style="color:var(--accent-gold);"><i class="fa-solid fa-user-gear"></i> Admin Control Panel</h3>
     <button class="btn-gold" onclick="closeAdminPanel()" style="background:var(--danger); color:#fff;">Close</button>
   </div>
   
@@ -180,11 +184,20 @@
     <label>Monetag Direct Link URL</label>
     <input type="text" id="adminMonetagUrl" class="form-control" placeholder="https://your-monetag-link.com">
   </div>
-  <button class="btn-gold" onclick="saveAdminSettings()">Save Settings</button>
+  <button class="btn-gold" onclick="saveAdminSettings()" style="margin-bottom: 20px;">Save Ad Link</button>
+
+  <div class="section-title"><i class="fa-solid fa-list-check"></i> All User Withdraw Requests</div>
+  <div id="adminWithdrawList" style="margin-bottom: 20px;">
+    <!-- Live Withdraw requests from users -->
+  </div>
+
+  <div class="section-title"><i class="fa-solid fa-users"></i> All Registered Users & Referrers</div>
+  <div id="adminAllUsersList">
+    <!-- All users list -->
+  </div>
 </div>
 
 <script>
-  // নতুন পাসওয়ার্ড সেটআপ (131272)
   const ADMIN_PASSWORD = "131272"; 
   const BOT_USERNAME = "FAST_ASH77_BOT"; 
 
@@ -200,7 +213,7 @@
     const tg = window.Telegram.WebApp;
     tg.ready();
 
-    const tgUser = tg.initDataUnsafe?.user || { id: Math.floor(Math.random()*100000), first_name: "User_" + Math.floor(Math.random()*900) };
+    const tgUser = tg.initDataUnsafe?.user || { id: Math.floor(Math.random()*100000), first_name: "User_" + Math.floor(Math.random()*900), username: "user_test" };
     const startParam = tg.initDataUnsafe?.start_param; 
     const referrerId = startParam ? parseInt(startParam) : null;
 
@@ -210,6 +223,7 @@
       const { data: newUser } = await db.from('users').insert([{
         telegram_id: tgUser.id,
         first_name: tgUser.first_name,
+        username: tgUser.username || tgUser.first_name,
         referred_by: referrerId
       }]).select().single();
 
@@ -225,6 +239,7 @@
 
     currentUser = user;
     renderUI(tgUser);
+    loadUserHistory();
   }
 
   function renderUI(tgUser) {
@@ -232,6 +247,21 @@
     document.getElementById('userAvatar').innerText = tgUser.first_name.charAt(0).toUpperCase();
     document.getElementById('userBalance').innerText = currentUser.balance.toFixed(2);
     document.getElementById('refLinkInput').value = `https://t.me/${BOT_USERNAME}?start=${currentUser.telegram_id}`;
+    
+    loadMyReferrals();
+  }
+
+  async function loadMyReferrals() {
+    const { data: refs } = await db.from('users').select('first_name, username').eq('referred_by', currentUser.telegram_id);
+    const list = document.getElementById('referredUsersList');
+    if (!refs || refs.length === 0) {
+      list.innerHTML = '<p style="font-size: 12px; color: var(--text-muted);">কেউ এখনো আপনার লিংকে জয়েন করেনি।</p>';
+      return;
+    }
+    list.innerHTML = '';
+    refs.forEach(r => {
+      list.innerHTML += `<div class="history-item"><b>${r.first_name}</b> <span style="color:var(--accent-gold);">@${r.username || 'N/A'}</span> <span class="badge badge-approved">+10 ৳</span></div>`;
+    });
   }
 
   function switchTab(tab, element) {
@@ -248,13 +278,13 @@
     alert("আপনার রেফারাল লিংক কপি করা হয়েছে!");
   }
 
-  // আপডেট করা পাসওয়ার্ড চেক ফাংশন
   function checkAdminPassword() {
     const pass = prompt("এডমিন প্যানেলে প্রবেশ করতে পাসওয়ার্ড দিন:");
     if (pass === ADMIN_PASSWORD) {
       document.getElementById('adminModal').classList.add('active');
+      loadAdminData();
     } else if (pass !== null) {
-      alert("ভুল পাসওয়ার্ড! প্রবেশাধিকার সংরক্ষিত।");
+      alert("ভুল পাসওয়ার্ড!");
     }
   }
 
@@ -265,8 +295,46 @@
   function saveAdminSettings() {
     const url = document.getElementById('adminMonetagUrl').value;
     localStorage.setItem('monetag_url', url);
-    alert("সেটিংস সফলভাবে সংরক্ষিত হয়েছে!");
-    closeAdminPanel();
+    alert("অ্যাড লিংক সফলভাবে সেভ হয়েছে!");
+  }
+
+  async function loadAdminData() {
+    document.getElementById('adminMonetagUrl').value = localStorage.getItem('monetag_url') || '';
+
+    // Load All Withdraw Requests for Admin
+    const { data: withdraws } = await db.from('withdraw_requests').select('*').order('id', { ascending: false });
+    const wList = document.getElementById('adminWithdrawList');
+    if (!withdraws || withdraws.length === 0) {
+      wList.innerHTML = '<p style="font-size:12px; color:var(--text-muted)">কোনো উইথড্র রিকোয়েস্ট নেই।</p>';
+    } else {
+      wList.innerHTML = '';
+      withdraws.forEach(w => {
+        wList.innerHTML += `
+          <div class="luxury-card" style="flex-direction:column; align-items:flex-start; gap:6px; font-size:12px;">
+            <div><b>User ID:</b> ${w.telegram_id}</div>
+            <div><b>Method:</b> ${w.method} | <b>Phone:</b> ${w.phone}</div>
+            <div><b>Amount:</b> ${w.amount} ৳ | <b>Status:</b> <span class="badge ${w.status=='Pending'?'badge-pending':'badge-approved'}">${w.status}</span></div>
+            ${w.status === 'Pending' ? `<button class="btn-gold" style="padding:4px 10px; font-size:11px;" onclick="approveWithdraw(${w.id})">Approve</button>` : ''}
+          </div>
+        `;
+      });
+    }
+
+    // Load All Users for Admin
+    const { data: allUsers } = await db.from('users').select('*');
+    const uList = document.getElementById('adminAllUsersList');
+    if (allUsers) {
+      uList.innerHTML = '';
+      allUsers.forEach(u => {
+        uList.innerHTML += `<div class="history-item"><div><b>${u.first_name}</b> (@${u.username || 'none'})<br><small style="color:var(--text-muted);">ID: ${u.telegram_id}</small></div><span style="color:var(--accent-gold); font-weight:700;">${u.balance} ৳</span></div>`;
+      });
+    }
+  }
+
+  async function approveWithdraw(id) {
+    await db.from('withdraw_requests').update({ status: 'Approved' }).eq('id', id);
+    alert("উইথড্র সফলভাবে এপ্রুভ করা হয়েছে!");
+    loadAdminData();
   }
 
   function watchMonetagAd() {
@@ -291,6 +359,10 @@
       alert("সঠিক মোবাইল নম্বর দিন!");
       return;
     }
+    if (isNaN(amount) || amount < 100) {
+      alert("সর্বনিম্ন উইথড্র ১০০ টাকা!");
+      return;
+    }
     if (amount > currentUser.balance) {
       alert("পর্যাপ্ত ব্যালেন্স নেই!");
       return;
@@ -300,7 +372,8 @@
       telegram_id: currentUser.telegram_id,
       method: method,
       phone: phone,
-      amount: amount
+      amount: amount,
+      status: 'Pending'
     }]);
 
     if (!error) {
@@ -308,9 +381,31 @@
       await db.from('users').update({ balance: newBal }).eq('telegram_id', currentUser.telegram_id);
       currentUser.balance = newBal;
       document.getElementById('userBalance').innerText = newBal.toFixed(2);
-      alert("উইথড্র রিকোয়েস্ট সফল হয়েছে!");
+      alert("উইথড্র রিকোয়েস্ট সফলভাবে জমা হয়েছে!");
+      loadUserHistory();
     }
+  }
+
+  async function loadUserHistory() {
+    const { data: history } = await db.from('withdraw_requests').select('*').eq('telegram_id', currentUser.telegram_id).order('id', { ascending: false });
+    const hContainer = document.getElementById('withdrawHistory');
+    if (!history || history.length === 0) {
+      hContainer.innerHTML = '<p style="font-size: 12px; color: var(--text-muted);">কোনো উইথড্র হিস্ট্রি নেই।</p>';
+      return;
+    }
+    hContainer.innerHTML = '';
+    history.forEach(h => {
+      hContainer.innerHTML += `
+        <div class="history-item">
+          <div>
+            <b>${h.method} (${h.phone})</b>
+            <div style="font-size:10px; color:var(--text-muted);">Amount: ${h.amount} ৳</div>
+          </div>
+          <span class="badge ${h.status == 'Pending' ? 'badge-pending' : 'badge-approved'}">${h.status}</span>
+        </div>
+      `;
+    });
   }
 </script>
 </body>
-      </html>
+        </html>
